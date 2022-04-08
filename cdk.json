@@ -8,7 +8,7 @@
       "README.md",
       "cdk*.json",
       "**/*.d.ts",
-      "**/*.js",
+      "**/*.ts",
       "tsconfig.json",
       "package*.json",
       "yarn.lock",
