@@ -4,7 +4,13 @@ import { SherryServerlessStack } from '../lib/sherry-serverless-stack';
 
 const app = new cdk.App();
 
-const env  = { account: '874345348099', region: 'us-east-1' };
+// move to env file
+const env  = { 
+    account: '874345348099', 
+    region: 'us-east-1',
+ };
+const hostedZoneName = 'embedded.sandbox.bench.co';
+const prefix = 'sherry-test';
 
 
-new SherryServerlessStack(app, 'SherryServerlessStack',{env});
+new SherryServerlessStack(app, `${prefix}-stack`,{env,hostedZoneName,prefix});
