@@ -10,7 +10,7 @@ const env  = {
     region: 'us-east-1',
  };
 const hostedZoneName = 'embedded.sandbox.bench.co';
-const prefix = 'sherry-test';
+const prefix = 'sherry';
 
 
 new SherryServerlessStack(app, `${prefix}-stack`,{env,hostedZoneName,prefix});

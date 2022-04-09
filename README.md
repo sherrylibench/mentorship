@@ -1,7 +1,10 @@
-# Welcome to your CDK TypeScript project
+# Welcome to my serverless mentorship project
 
-You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`SherryServerlessStack`)
-which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
+To check my stack:
+sherry.embedded.sandbox.bench.co/
+
+See my mentorship notes here: 
+https://docs.google.com/document/d/1asv_mbEvaHN1WDyZwjmw8r6MCEIqiszJRoWrGzPERtI/edit#heading=h.sabolg9a48wl
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 

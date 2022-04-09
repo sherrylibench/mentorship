@@ -3,6 +3,6 @@ exports.handler =async (event: any) => {
     return {
         statusCode: 200,
         headers: { "Content-Type": "text/plain" },
-        body: `Hello, CDK wat! You've hit ${event.path}\n`
+        body: `Hello, CDK watch! You've hit ${event.path}\n`
     }
 }

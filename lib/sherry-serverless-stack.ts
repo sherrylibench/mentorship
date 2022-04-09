@@ -43,7 +43,7 @@ export class SherryServerlessStack extends cdk.Stack {
         certificate: acm.Certificate.fromCertificateArn(
           this,
           `${props.prefix}-certificate`,
-          " arn:aws:acm:us-east-1:874345348099:certificate/4a8b604f-efc0-4f7f-9b22-6fb0010a6e56"
+          "arn:aws:acm:us-east-1:874345348099:certificate/4a8b604f-efc0-4f7f-9b22-6fb0010a6e56"
         ),
         endpointType: apigw.EndpointType.REGIONAL,
       },
@@ -52,7 +52,7 @@ export class SherryServerlessStack extends cdk.Stack {
     // ARecord
     new route53.ARecord(this, `${props.prefix}-dns`, {
       zone: hostedZone,
-      recordName: `${props.prefix}-dns`,
+      recordName: `${props.prefix}`,
       target: route53.RecordTarget.fromAlias(
         new route53Targets.ApiGateway(sherryRestAPI)
       ),
