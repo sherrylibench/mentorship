@@ -5,24 +5,26 @@ import { HitCounter } from './hitcounter';
 import * as route53 from 'aws-cdk-lib/aws-route53'
 import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 import * as route53Targets from 'aws-cdk-lib/aws-route53-targets'
+import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 
 type sherryStackProps = cdk.StackProps & {
   hostedZoneName: string,
   prefix: string,
 }
+
 export class SherryServerlessStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props: sherryStackProps) {
     super(scope, id, props);
 
-    //lambda functions
+    //2 lambda functions
     const hello = new lambda.Function(this, `${props.prefix}-HelloHandler`,{
       runtime: lambda.Runtime.NODEJS_14_X,
       code: lambda.Code.fromAsset('lambda'),
-      handler: 'hello.handler'
+      handler: 'hello.handler',
     });
 
     const helloCounter = new HitCounter(this, `${props.prefix}-HitCounterHandler`,{
-      downstream:hello,
+      downstream: hello,
     })
 
     //custom domain
@@ -33,8 +35,7 @@ export class SherryServerlessStack extends cdk.Stack {
     });
 
     //api gateway
-    const sherryRestAPI = new apigw.LambdaRestApi(this, `${props.prefix}-restAPI`,{
-      handler: helloCounter.handler,
+    const sherryRestAPI = new apigw.RestApi(this, `${props.prefix}-restAPI`,{
       endpointConfiguration: {
         types:[apigw.EndpointType.REGIONAL],
       },
@@ -47,7 +48,36 @@ export class SherryServerlessStack extends cdk.Stack {
         ),
         endpointType: apigw.EndpointType.REGIONAL,
       },
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigw.Cors.ALL_ORIGINS,
+        allowHeaders: apigw.Cors.DEFAULT_HEADERS,
+        allowMethods: apigw.Cors.ALL_METHODS,
+      },
     });
+
+    //create handler
+    const rescource = sherryRestAPI.root;
+    rescource.addMethod(
+      'GET', 
+      new LambdaIntegration(helloCounter.handler, {})
+    );
+
+    // gateway response
+    sherryRestAPI.addGatewayResponse(
+      `${props.prefix}-access-denied-response`,
+      {
+        type: apigw.ResponseType.MISSING_AUTHENTICATION_TOKEN,
+        statusCode: '403',
+        templates: {
+          'application/json': JSON.stringify({
+            code: 'MISSING_AUTHENTICATION_TOKEN',
+            message: '$context.error.message',
+            reason: 'The HTTP method or resources may not be supported',
+          }),
+        },
+        
+      }
+    );
 
     // ARecord
     new route53.ARecord(this, `${props.prefix}-dns`, {
