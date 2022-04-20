@@ -6,6 +6,8 @@ import * as route53 from 'aws-cdk-lib/aws-route53'
 import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 import * as route53Targets from 'aws-cdk-lib/aws-route53-targets'
 import { LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as path from 'path';
 
 type sherryStackProps = cdk.StackProps & {
   hostedZoneName: string,
@@ -16,7 +18,7 @@ export class SherryServerlessStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props: sherryStackProps) {
     super(scope, id, props);
 
-    //2 lambda functions
+    //3 lambda functions
     const hello = new lambda.Function(this, `${props.prefix}-HelloHandler`,{
       runtime: lambda.Runtime.NODEJS_14_X,
       code: lambda.Code.fromAsset('lambda'),
@@ -27,6 +29,18 @@ export class SherryServerlessStack extends cdk.Stack {
       downstream: hello,
     })
 
+    const nodejsFunction = new NodejsFunction(this,`${props.prefix}-NodejsFunctionHandler`, {
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(5),
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'main',
+      entry: path.join(__dirname, `/../lambda/nodeFunction.ts`),
+      bundling: {
+        minify: true,
+        externalModules: ['aws-sdk'],
+      },
+    });
+    
     //custom domain
     const hostedZoneName = props.hostedZoneName;
 
@@ -60,6 +74,10 @@ export class SherryServerlessStack extends cdk.Stack {
     rescource.addMethod(
       'GET', 
       new LambdaIntegration(helloCounter.handler, {})
+    );
+    rescource.addMethod(
+      'POST', 
+      new LambdaIntegration(nodejsFunction, {})
     );
 
     // gateway response
