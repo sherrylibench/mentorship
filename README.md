@@ -1,4 +1,4 @@
-# Welcome to my serverless mentorship project
+# My serverless mentorship project with Brent
 
 To check my stack:
 sherry.embedded.sandbox.bench.co/
